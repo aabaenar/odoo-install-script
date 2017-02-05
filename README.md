@@ -17,7 +17,7 @@ Install developement or production
     sudo ./odoo-install-script
 
 # Run script with parameters you need
-# (list of all parameters with default values can be found at odoo-installscript.sh)
+(list of all parameters with default values can be found at odoo-installscript.sh)
 
     OE_USER="odoo"
     OE_HOME="/$OE_USER"
@@ -26,8 +26,9 @@ Install developement or production
     INSTALL_WKHTMLTOPDF="True"
     OE_PORT="8069"
 
-# Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
-# IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
+Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
+IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
+
     OE_VERSION="9.0"
 
 # Set to true if you have to install OCA custom addons
