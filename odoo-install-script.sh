@@ -3,6 +3,7 @@
 # Script for installing Odoo V8, V9, and also V10 on Ubuntu 14.04 LTS (could be used for other version too)
 # Based on : Yenthe Van Ginneken https://github.com/Yenthe666/InstallScript and
 #            Ivan Yelizariev https://github.com/it-projects-llc/install-odoo
+# Add Argentina addons to help some friends :D 
 #-------------------------------------------------------------------------------
 # This script will install Odoo on your Ubuntu 14.04 or 16.04 server. It can install multiple Odoo instances
 # in one Ubuntu because of the different xmlrpc_ports
