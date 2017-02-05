@@ -1,9 +1,10 @@
 #!/bin/bash
 ################################################################################
-# Script for installing Odoo on Ubuntu 14.04, 15.04 and 16.04 (could be used for other version too)
-# Based on: Yenthe Van Ginneken (https://raw.githubusercontent.com/Yenthe666/InstallScript/All/odoo_install.sh)
+# Script for installing Odoo V8, V9, and also V10 on Ubuntu 14.04 LTS (could be used for other version too)
+# Based on : Yenthe Van Ginneken https://github.com/Yenthe666/InstallScript and
+#            Ivan Yelizariev https://github.com/it-projects-llc/install-odoo
 #-------------------------------------------------------------------------------
-# This script will install Odoo on your Ubuntu 14.04 server. It can install multiple Odoo instances
+# This script will install Odoo on your Ubuntu 14.04 or 16.04 server. It can install multiple Odoo instances
 # in one Ubuntu because of the different xmlrpc_ports
 #-------------------------------------------------------------------------------
 # Make a new file:
@@ -13,12 +14,13 @@
 # Execute the script to install Odoo:
 # ./odoo-install
 ################################################################################
- 
+
 ##fixed parameters
 #odoo
 OE_USER="odoo"
-OE_HOME="/opt/$OE_USER"
-OE_HOME_EXT="/opt/$OE_USER/${OE_USER}-server"
+OE_HOME="/$OE_USER"
+OE_ADDONS="$OE_HOME/custom/addons"
+OE_HOME_EXT="/$OE_USER/${OE_USER}-server"
 #The default port where this Odoo instance will run under (provided you use the command -c in the terminal)
 #Set to true if you want to install it, false if you don't need it or have it already installed.
 INSTALL_WKHTMLTOPDF="True"
@@ -27,8 +29,8 @@ OE_PORT="8069"
 #Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
 #IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
 OE_VERSION="9.0"
-# Set this to True if you want to install Odoo 9 Enterprise!
-IS_ENTERPRISE="False"
+#Set to true if you have to install OCA custom addons
+INSTALL_CUSTOM="True"
 #set the superadmin password
 OE_SUPERADMIN="admin"
 OE_CONFIG="${OE_USER}-server"
@@ -36,7 +38,7 @@ OE_CONFIG="${OE_USER}-server"
 ##
 ###  WKHTMLTOPDF download links
 ## === Ubuntu Trusty x64 & x32 === (for other distributions please replace these two links,
-## in order to have correct version of wkhtmltox installed, for a danger note refer to 
+## in order to have correct version of wkhtmltox installed, for a danger note refer to
 ## https://www.odoo.com/documentation/8.0/setup/install.html#deb ):
 WKHTMLTOX_X64=http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
 WKHTMLTOX_X32=http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-i386.deb
@@ -62,14 +64,12 @@ sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
 #--------------------------------------------------
 echo -e "\n---- Install tool packages ----"
 sudo apt-get install wget subversion git bzr bzrtools python-pip gdebi-core -y
-	
+
 echo -e "\n---- Install python packages ----"
 sudo apt-get install python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y
-	
+
 echo -e "\n---- Install python libraries ----"
-sudo pip install gdata psycogreen
-# This is for compatibility with Ubuntu 16.04. Will work on 14.04, 15.04 and 16.04
-sudo -H pip install suds
+sudo -H pip install gdata psycogreen ofxparse
 
 echo -e "\n--- Install other required packages"
 sudo apt-get install node-clean-css -y
@@ -94,7 +94,7 @@ if [ $INSTALL_WKHTMLTOPDF = "True" ]; then
 else
   echo "Wkhtmltopdf isn't installed due to the choice of the user!"
 fi
-	
+
 echo -e "\n---- Create ODOO system user ----"
 sudo adduser --system --quiet --shell=/bin/bash --home=$OE_HOME --gecos 'ODOO' --group $OE_USER
 #The user should also be added to the sudo'ers group.
@@ -105,30 +105,50 @@ sudo mkdir /var/log/$OE_USER
 sudo chown $OE_USER:$OE_USER /var/log/$OE_USER
 
 #--------------------------------------------------
-# Install ODOO
+# Install ODOO and OCA custom addons
 #--------------------------------------------------
 echo -e "\n==== Installing ODOO Server ===="
-sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/odoo $OE_HOME_EXT/
+sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/OCB $OE_HOME_EXT/
 
-if [ $IS_ENTERPRISE = "True" ]; then
-    # Odoo Enterprise install!
-	echo -e "\n--- Create symlink for node"
-    sudo ln -s /usr/bin/nodejs /usr/bin/node
-	sudo su $OE_USER -c "mkdir $OE_HOME/enterprise"
-    sudo su $OE_USER -c "mkdir $OE_HOME/enterprise/addons"
-	
-    echo -e "\n---- Adding Enterprise code under $OE_HOME/enterprise/addons ----"
-    sudo git clone --depth 1 --branch 9.0 https://www.github.com/odoo/enterprise "$OE_HOME/enterprise/addons"
+echo -e "\n---- Create custom module directory ----"
+sudo su $OE_USER -c "mkdir -p $OE_ADDONS"
 
-    echo -e "\n---- Installing Enterprise specific libraries ----"
-    sudo apt-get install nodejs npm
-    sudo npm install -g less
-    sudo npm install -g less-plugin-clean-css
-else 
-    echo -e "\n---- Create custom module directory ----"
-    sudo su $OE_USER -c "mkdir $OE_HOME/custom"
-    sudo su $OE_USER -c "mkdir $OE_HOME/custom/addons" 
-fi	
+if [ $INSTALL_CUSTOM = "True" ]; then
+  echo -e "\n==== Installing ODOO custom addons ===="
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/website $OE_ADDONS/oca/website
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/partner-contact $OE_ADDONS/oca/partner-contact
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/web $OE_ADDONS/oca/web
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/server-tools $OE_ADDONS/oca/server-tools
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-financial-tools $OE_ADDONS/oca/account-financial-tools
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/stock-logistics-workflow $OE_ADDONS/oca/stock-logistics-workflow
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/stock-logistics-warehouse $OE_ADDONS/oca/stock-logistics-warehouse
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/purchase-workflow $OE_ADDONS/oca/purchase-workflow
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-invoicing $OE_ADDONS/oca/account-invoicing
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/social $OE_ADDONS/oca/social
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/sale-workflow $OE_ADDONS/oca/sale-workflow
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/event $OE_ADDONS/oca/event
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/e-commerce $OE_ADDONS/oca/e-commerce
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-invoice-reporting $OE_ADDONS/oca/account-invoice-reporting
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-financial-reporting $OE_ADDONS/oca/account-financial-reporting
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/hr $OE_ADDONS/oca/hr
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/project $OE_ADDONS/oca/project
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-payment $OE_ADDONS/oca/account-payment
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/runbot-addons $OE_ADDONS/oca/runbot-addons
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/product-attribute $OE_ADDONS/oca/product-attribute
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/product-variant $OE_ADDONS/oca/product-variant
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/crm $OE_ADDONS/oca/crm
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/contract $OE_ADDONS/oca/contract
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/account-analytic $OE_ADDONS/oca/account-analytic
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/OCA/stock-logistics-transport $OE_ADDONS/oca/stock-logistics-transport
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/mail-addons $OE_ADDONS/it-projects-llc/mail-addons
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/website-addons $OE_ADDONS/it-projects-llc/website-addons
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/access-addons $OE_ADDONS/it-projects-llc/access-addons
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/pos-addons $OE_ADDONS/it-projects-llc/pos-addons
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/Vauxoo/addons-vauxoo $OE_ADDONS/vauxoo/addons-vauxoo
+  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/ingadhoc/odoo-argentina $OE_ADDONS/ingadhoc
+else
+  echo "OCA custom addons isn't installed due to the choice of the user!"
+fi
 
 echo -e "\n---- Setting permissions on home folder ----"
 sudo chown -R $OE_USER:$OE_USER $OE_HOME/*
@@ -142,12 +162,8 @@ echo -e "* Change server config file"
 sudo sed -i s/"db_user = .*"/"db_user = $OE_USER"/g /etc/${OE_CONFIG}.conf
 sudo sed -i s/"; admin_passwd.*"/"admin_passwd = $OE_SUPERADMIN"/g /etc/${OE_CONFIG}.conf
 sudo su root -c "echo 'logfile = /var/log/$OE_USER/$OE_CONFIG$1.log' >> /etc/${OE_CONFIG}.conf"
-if [  $IS_ENTERPRISE = "True" ]; then
-    sudo su root -c "echo 'addons_path=$OE_HOME/enterprise/addons,$OE_HOME_EXT/addons' >> /etc/${OE_CONFIG}.conf"
-else
-    sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,$OE_HOME/custom/addons' >> /etc/${OE_CONFIG}.conf"
-fi
-	
+sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,$OE_HOME/custom/addons' >> /etc/${OE_CONFIG}.conf"
+
 echo -e "* Create startup file"
 sudo su root -c "echo '#!/bin/sh' >> $OE_HOME_EXT/start.sh"
 sudo su root -c "echo 'sudo -u $OE_USER $OE_HOME_EXT/openerp-server --config=/etc/${OE_CONFIG}.conf' >> $OE_HOME_EXT/start.sh"
@@ -230,6 +246,7 @@ sudo chmod 755 /etc/init.d/$OE_CONFIG
 sudo chown root: /etc/init.d/$OE_CONFIG
 
 echo -e "* Change default xmlrpc port"
+sudo su root -c "echo 'xmlrpc_interface = 127.0.0.1' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "echo 'xmlrpc_port = $OE_PORT' >> /etc/${OE_CONFIG}.conf"
 
 echo -e "* Start ODOO on Startup"
