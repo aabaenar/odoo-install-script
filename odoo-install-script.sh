@@ -145,7 +145,6 @@ if [ $INSTALL_CUSTOM = "True" ]; then
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/access-addons $OE_ADDONS/it-projects-llc/access-addons
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/pos-addons $OE_ADDONS/it-projects-llc/pos-addons
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/Vauxoo/addons-vauxoo $OE_ADDONS/vauxoo/addons-vauxoo
-  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/ingadhoc/odoo-argentina $OE_ADDONS/ingadhoc
 else
   echo "OCA custom addons isn't installed due to the choice of the user!"
 fi
