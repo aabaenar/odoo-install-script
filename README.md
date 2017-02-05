@@ -1,4 +1,4 @@
-# install-odoo
+# install-odoo-script
 
 Install developement or production
 
@@ -16,8 +16,8 @@ Install developement or production
     sudo chmod +x odoo-install-script.sh
     sudo ./odoo-install-script
 
-    # run script with parameters you need
-    # (list of all parameters with default values can be found at odoo-installscript.sh)
+# Run script with parameters you need
+# (list of all parameters with default values can be found at odoo-installscript.sh)
 
     OE_USER="odoo"
     OE_HOME="/$OE_USER"
@@ -26,21 +26,21 @@ Install developement or production
     INSTALL_WKHTMLTOPDF="True"
     OE_PORT="8069"
 
-    #Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
-    #IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
+# Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
+# IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
     OE_VERSION="9.0"
 
-    #Set to true if you have to install OCA custom addons
+# Set to true if you have to install OCA custom addons
     INSTALL_CUSTOM="True"
 
-    #set the superadmin password
+# Set the superadmin password
     OE_SUPERADMIN="admin"
 
     OE_CONFIG="${OE_USER}-server"
 
 ## After installation
 
-    # show settings (admin password, addons path)
+# Show settings (admin password, addons path)
 
     The Odoo server is up and running. Specifications:
     Port: 8069
@@ -52,11 +52,9 @@ Install developement or production
     Stop Odoo service: sudo service odoo-server stop
     Restart Odoo service: sudo service odoo-server restart
 
-    # log
+    *log*
     tail -f -n 100 /var/log/odoo/odoo-server.log
 
-
-After that you need to edit config file and update db_filter value to *^%h$*.
 
 # Contributors
 
