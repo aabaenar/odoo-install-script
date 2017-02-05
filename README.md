@@ -17,7 +17,7 @@ Install developement or production
     sudo ./odoo-install-script
 
 # Run script with parameters you need
-(list of all parameters with default values can be found at odoo-installscript.sh)
+List of all parameters with default values can be found at odoo-installscript.sh
 
     OE_USER="odoo"
     OE_HOME="/$OE_USER"
