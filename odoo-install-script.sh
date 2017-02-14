@@ -245,7 +245,7 @@ sudo chmod 755 /etc/init.d/$OE_CONFIG
 sudo chown root: /etc/init.d/$OE_CONFIG
 
 echo -e "* Change default xmlrpc port"
-sudo su root -c "echo 'xmlrpc_interface = 127.0.0.1' >> /etc/${OE_CONFIG}.conf"
+# sudo su root -c "echo 'xmlrpc_interface = 127.0.0.1' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "echo 'xmlrpc_port = $OE_PORT' >> /etc/${OE_CONFIG}.conf"
 
 echo -e "* Start ODOO on Startup"
