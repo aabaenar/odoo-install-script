@@ -53,7 +53,8 @@ IMPORTANT! This script contains extra libraries that are specifically needed for
     Stop Odoo service: sudo service odoo-server stop
     Restart Odoo service: sudo service odoo-server restart
 
-    *log*
+# log
+
     tail -f -n 100 /var/log/odoo/odoo-server.log
 
 
