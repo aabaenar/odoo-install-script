@@ -76,6 +76,14 @@ sudo apt-get install node-clean-css -y
 sudo apt-get install node-less -y
 sudo apt-get install python-gevent -y
 
+echo -e "\n---- Installing Node & Less specific libraries ----"
+sudo apt-get install nodejs npm -y
+sudo npm install -g less
+sudo npm install -g less-plugin-clean-css
+
+echo -e "\n--- Create symlink for node"
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+
 #--------------------------------------------------
 # Install Wkhtmltopdf if needed
 #--------------------------------------------------
@@ -245,7 +253,6 @@ sudo chmod 755 /etc/init.d/$OE_CONFIG
 sudo chown root: /etc/init.d/$OE_CONFIG
 
 echo -e "* Change default xmlrpc port"
-# sudo su root -c "echo 'xmlrpc_interface = 127.0.0.1' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "echo 'xmlrpc_port = $OE_PORT' >> /etc/${OE_CONFIG}.conf"
 
 echo -e "* Start ODOO on Startup"
