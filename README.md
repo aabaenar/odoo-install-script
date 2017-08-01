@@ -7,7 +7,7 @@ Install developement or production
 ## Getting script
 
     sudo apt-get install git -y
-    git clone https://github.com/rcastro-tyc/odoo-install-script
+    git clone --branch odoo-argentina https://github.com/rcastro-tyc/odoo-install-script
 
 ## Running script
 
