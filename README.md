@@ -7,7 +7,7 @@ Install developement or production
 ## Getting script
 
     sudo apt-get install git -y
-    git clone --branch odoo-argentina https://github.com/rcastro-tyc/odoo-install-script
+    git clone --branch master https://github.com/rcastro-tyc/odoo-install-script
 
 ## Running script
 
@@ -21,7 +21,7 @@ List of all parameters with default values can be found at odoo-installscript.sh
 
     OE_USER="odoo"
     OE_HOME="/$OE_USER"
-    OE_ADDONS="$OE_HOME/custom/addons"
+    OE_ADDONS="$OE_HOME/custom-addons"
     OE_HOME_EXT="/$OE_USER/${OE_USER}-server"
     INSTALL_WKHTMLTOPDF="True"
     OE_PORT="8069"
@@ -48,7 +48,7 @@ IMPORTANT! This script contains extra libraries that are specifically needed for
     User service: odoo-server
     User PostgreSQL: odoo
     Code location: /odoo/
-    Addons folder: /odoo/custom/addons/
+    Addons folder: /odoo/custom-addons/
     Start Odoo service: sudo service odoo-server start
     Stop Odoo service: sudo service odoo-server stop
     Restart Odoo service: sudo service odoo-server restart
