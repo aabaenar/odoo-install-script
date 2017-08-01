@@ -20,7 +20,7 @@
 #odoo
 OE_USER="odoo"
 OE_HOME="/$OE_USER"
-OE_ADDONS="$OE_HOME/custom/addons"
+OE_ADDONS="$OE_HOME/custom-addons"
 OE_HOME_EXT="/$OE_USER/${OE_USER}-server"
 #The default port where this Odoo instance will run under (provided you use the command -c in the terminal)
 #Set to true if you want to install it, false if you don't need it or have it already installed.
@@ -41,8 +41,8 @@ OE_CONFIG="${OE_USER}-server"
 ## === Ubuntu Trusty x64 & x32 === (for other distributions please replace these two links,
 ## in order to have correct version of wkhtmltox installed, for a danger note refer to
 ## https://www.odoo.com/documentation/8.0/setup/install.html#deb ):
-WKHTMLTOX_X64=http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
-WKHTMLTOX_X32=http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-i386.deb
+WKHTMLTOX_X64=https://downloads.wkhtmltopdf.org/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
+WKHTMLTOX_X32=https://downloads.wkhtmltopdf.org/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-i386.deb
 
 #--------------------------------------------------
 # Update Server
@@ -154,7 +154,6 @@ if [ $INSTALL_CUSTOM = "True" ]; then
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/access-addons $OE_ADDONS/it-projects-llc/access-addons
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/it-projects-llc/pos-addons $OE_ADDONS/it-projects-llc/pos-addons
   sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/Vauxoo/addons-vauxoo $OE_ADDONS/vauxoo/addons-vauxoo
-  sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/ingadhoc/odoo-argentina $OE_ADDONS/ingadhoc
 else
   echo "OCA custom addons isn't installed due to the choice of the user!"
 fi
@@ -171,7 +170,7 @@ echo -e "* Change server config file"
 sudo sed -i s/"db_user = .*"/"db_user = $OE_USER"/g /etc/${OE_CONFIG}.conf
 sudo sed -i s/"; admin_passwd.*"/"admin_passwd = $OE_SUPERADMIN"/g /etc/${OE_CONFIG}.conf
 sudo su root -c "echo 'logfile = /var/log/$OE_USER/$OE_CONFIG$1.log' >> /etc/${OE_CONFIG}.conf"
-sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,$OE_HOME/custom/addons' >> /etc/${OE_CONFIG}.conf"
+sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,$OE_HOME/custom-addons' >> /etc/${OE_CONFIG}.conf"
 
 echo -e "* Create startup file"
 sudo su root -c "echo '#!/bin/sh' >> $OE_HOME_EXT/start.sh"
@@ -255,7 +254,6 @@ sudo chmod 755 /etc/init.d/$OE_CONFIG
 sudo chown root: /etc/init.d/$OE_CONFIG
 
 echo -e "* Change default xmlrpc port"
-sudo su root -c "echo 'xmlrpc_interface = 127.0.0.1' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "echo 'xmlrpc_port = $OE_PORT' >> /etc/${OE_CONFIG}.conf"
 
 echo -e "* Start ODOO on Startup"
